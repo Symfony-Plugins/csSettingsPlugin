@@ -1,0 +1,14 @@
+cs_setting:
+  class: sfDoctrineRouteCollection
+  options:
+    model:                csSetting
+    module:               csSetting
+    prefix_path:          cs_setting
+    column:               id
+    with_wildcard_routes: true
+
+cs_setting_save_all:
+  url:     /cs_setting_save_all
+  param:   { module: csSetting, action: listSaveSettings }
+  requirements: { sf_method: post }
+  

@@ -1,0 +1,12 @@
+all:
+  csSettingsPlugin:
+    types:      
+      input:        Text Field
+      textarea:     Text Area
+      checkbox:     Checkbox
+      select:       Select List
+      yesno:        Yes/No Radios
+      model:        Database Model
+      upload:       Upload
+    authMethod:     isAuthenticated   #used to determine when seo admin bar is visible
+    tableMethod:    findAll           #used to pull the list of settings
