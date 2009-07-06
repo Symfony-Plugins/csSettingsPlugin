@@ -118,10 +118,15 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
   public function getUploadSettingWidget()
   {
     $path = $this->getObject()->getUploadPath() . '/' . $this->getObject()->getValue();
-    return new sfWidgetFormInputFileEditable(array(
+    $options = array(
           'file_src' => $this->getObject()->getValue(),
           'template' => "<a href='/$path'>%file%</a><br />%input%<br />%delete% %delete_label%",
-      ));
+      );
+    
+    // If you want to pass the widget custom settings, you can override in your setting's options  
+    $options = array_merge($options, $this->getObject()->getOptionsArray());
+    
+    return new sfWidgetFormInputFileEditable($options);
   }
   public function bind(array $taintedValues = null, array $taintedFiles = null)
   {

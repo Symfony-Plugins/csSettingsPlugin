@@ -35,12 +35,12 @@ class BasecsSettingActions extends AutocsSettingActions
     
     if($files = $request->getFiles('cs_setting'))
     {
-      $this->processUpload($files);
+      $this->processUpload($settings, $files);
     }
     $this->getUser()->setFlash('notice', 'Your settings have been saved.');
     $this->redirect('@cs_setting');
   }
-  public function processUpload($files)
+  public function processUpload($settings, $files)
   {
     $default_path = csSettings::getDefaultUploadPath();
     
@@ -71,6 +71,13 @@ class BasecsSettingActions extends AutocsSettingActions
           $setting->setValue(basename($file['name']));
           $setting->save();
         }
+      }
+      elseif (isset($settings[$slug.'_delete'])) 
+      {
+        $setting = Doctrine::getTable('csSetting')->findOneBySlug($slug);
+        unlink($setting->getUploadPath().'/'.$setting->getValue());
+        $setting->setValue('');
+        $setting->save();
       }
     }
   }
