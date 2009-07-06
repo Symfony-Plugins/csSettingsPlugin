@@ -19,4 +19,28 @@ abstract class PlugincsSetting extends BasecsSetting
     
     return isset($config[$name]) ? $config[$name] : false;
   }
+  
+  public function getOptionsArray()
+  {
+    sfProjectConfiguration::getActive()->loadHelpers(array('Tag'));
+    return _parse_attributes($this->getOptions());
+  }
+  
+  public function getUploadPath()
+  {
+    if ($this['type'] != 'upload') 
+    {
+      throw new sfException(sprintf('Cannot get Upload Path for setting of type "%s"', $this['type']));
+    }
+    
+    $default_path = csSettings::getDefaultUploadPath();
+        
+    $target_path = $this->getOption('upload_path');
+    
+    return $target_path ? $target_path : $default_path;
+  }
+  public function getGroup()
+  {
+    return $this['setting_group'];
+  }
 }

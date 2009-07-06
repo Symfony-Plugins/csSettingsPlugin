@@ -7,5 +7,28 @@
  */
 class PlugincsSettingTable extends Doctrine_Table
 {
-  
+  public function findSettingsByGroup($query)
+  {
+    return $query->addOrderBy($query->getRootAlias().'.setting_group ASC');
+  }
+  public function getExistingGroupsArray()
+  {
+    $groups = $this->createQuery()
+                   ->groupBy('setting_group')
+                   ->execute();
+                   
+    $groupArray = array();
+    
+    foreach ($groups as $group) 
+    {
+      $groupArray[$group['setting_group']] = $group['setting_group'];
+    }
+    return array_filter($groupArray);
+  }
+  public function getExistingGroupsArrayTest()
+  {
+    $conn = Doctrine_Manager::connection();
+    $groups = $conn->standaloneQuery('SELECT * from cs_setting');
+    return $groups;
+  }
 }

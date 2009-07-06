@@ -11,25 +11,7 @@
  * @license See LICENSE that came packaged with this software
  */
 class BasecsSettingActions extends AutocsSettingActions
-{
-  public function executeValue_element()
-  {
-    $setting_id = $this->getRequestParameter('setting_id');
-
-    $this->cs_setting = Doctrine::getTable('csSetting')->find($setting_id);
-    $this->cs_setting = $this->cs_setting ? $this->cs_setting:new csSetting();
-
-    if( $this->getRequest()->hasParameter('type') )
-    {
-      $this->cs_setting->setType($this->getRequestParameter('type'));
-    }
-
-    if( $this->getRequest()->hasParameter('options') )
-    {
-      $this->cs_setting->setOptions($this->getRequestParameter('options'));
-    }
-  }
-  
+{ 
   public function executeIndex(sfWebRequest $request)
   {
     $this->form = new SettingsListForm();
@@ -40,11 +22,14 @@ class BasecsSettingActions extends AutocsSettingActions
   {
     if($settings = $this->getRequestParameter('cs_setting'))
     {
-      foreach($settings AS $setting_id => $value)
+      foreach($settings AS $slug => $value)
       {
-        $setting = Doctrine::getTable('csSetting')->find($setting_id);
-        $setting->setValue($value);
-        $setting->save();
+        $setting = Doctrine::getTable('csSetting')->findOneBySlug($slug);
+        if ($setting) 
+        {
+          $setting->setValue($value);
+          $setting->save();
+        }
       }
     }
     
@@ -59,11 +44,11 @@ class BasecsSettingActions extends AutocsSettingActions
   {
     $default_path = csSettings::getDefaultUploadPath();
     
-    foreach ($files as $setting_id => $file) 
+    foreach ($files as $slug => $file) 
     {
       if ($file['name']) 
       {
-        $setting = Doctrine::getTable('csSetting')->find($setting_id);
+        $setting = Doctrine::getTable('csSetting')->findOneBySlug($slug);
         
         $target_path = $setting->getOption('upload_path');
         

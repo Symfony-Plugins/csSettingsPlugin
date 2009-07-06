@@ -10,4 +10,8 @@
  */
 class csSettingGeneratorConfiguration extends BaseCsSettingGeneratorConfiguration
 {
+  public function getTableMethod()
+  {
+    return 'findSettingsByGroup';
+  }
 }

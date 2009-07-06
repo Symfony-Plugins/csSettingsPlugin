@@ -57,13 +57,13 @@
    <file baseinstalldir="/" md5sum="e3b6fc5bb442b90de8e3304b424ba22d" name="modules/csSettings/actions/actions.class.php" role="php" />
    <file baseinstalldir="/" md5sum="3c4a5b2ca5cf3e4bd70c78a6ec9c5555" name="modules/csSettings/config/generator.yml" role="data" />
    <file baseinstalldir="/" md5sum="6394350b44beaad3c9f34e21c366c1f5" name="modules/csSettings/lib/BasecsSettingsActions.class.php" role="php" />
-   <file baseinstalldir="/" md5sum="36f53cf7254bbbcf79352e743e5193d5" name="modules/csSettings/templates/value_elementSuccess.php" role="php" />
+   <file baseinstalldir="/" md5sum="36f53cf7254bbbcf79352e743e5193d5" name="modules/csSettings/templates/valueSuccess.php" role="php" />
    <file baseinstalldir="/" md5sum="c2ba7fbaf93f2dbd5582420888e3380c" name="modules/csSettings/templates/_list_footer.php" role="php" />
    <file baseinstalldir="/" md5sum="d14cb99943507583a8b1e578a69cfa8e" name="modules/csSettings/templates/_list_header.php" role="php" />
    <file baseinstalldir="/" md5sum="d3f1d0d4189f625b7d8dcc4335bacf58" name="modules/csSettings/templates/_multi_value.php" role="php" />
    <file baseinstalldir="/" md5sum="ba71348d7571b0393a7bddaa168634e3" name="modules/csSettings/templates/_type.php" role="php" />
    <file baseinstalldir="/" md5sum="e249be92cdd94364352b0bc35d916f64" name="modules/csSettings/templates/_value.php" role="php" />
-   <file baseinstalldir="/" md5sum="de44a75c45917c3cf3084af6056f2926" name="modules/csSettings/templates/_value_element.php" role="php" />
+   <file baseinstalldir="/" md5sum="de44a75c45917c3cf3084af6056f2926" name="modules/csSettings/templates/_value.php" role="php" />
    <file baseinstalldir="/" md5sum="2c161ecba02989f2294b5e6fc0eab993" name="modules/csSettings/validate/edit.yml" role="data" />
    <file baseinstalldir="/" md5sum="95e4b5051725635bb326237dcda6c473" name="LICENSE" role="doc" />
    <file baseinstalldir="/" md5sum="c2887202645bdd2cc102357ad1856a50" name="README" role="doc" />

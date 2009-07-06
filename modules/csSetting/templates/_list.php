@@ -28,9 +28,18 @@
         </tr>
       </tfoot>
       <tbody>
+        <?php $group = '' ?>
         <?php foreach ($pager->getResults() as $i => $cs_setting): $odd = fmod(++$i, 2) ? 'odd' : 'even' ?>
+          <?php if ($cs_setting['group'] != $group): ?>
+            <tr class="sf_admin_row sf_admin_list_th_name sf_admin_setting_group">
+              <th colspan="3">
+                <?php echo $cs_setting['group'] ?>
+              </th>
+            </tr>
+          <?php endif ?>
+          <?php $group = $cs_setting->getGroup(); ?>
           <tr class="sf_admin_row <?php echo $odd ?>">
-            <?php include_partial('csSetting/list_td_tabular', array('cs_setting' => $cs_setting)) ?>
+            <?php include_partial('csSetting/list_td_tabular', array('cs_setting' => $cs_setting, 'form' => $form)) ?>
             <?php include_partial('csSetting/list_td_actions', array('cs_setting' => $cs_setting, 'helper' => $helper)) ?>
           </tr>
         <?php endforeach; ?>

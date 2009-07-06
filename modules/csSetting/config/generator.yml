@@ -15,19 +15,18 @@ generator:
         multi_value:    { label: Value }
       list:
         title:          Settings
-        display:        [=name, _value_element]
-        # actions:        []
+        display:        [name, _value]
         object_actions: 
           _edit:    ~
           _delete:  ~
         batch_actions:  []
       edit:
         title:          Edit Setting
-        display:        [name, type, options]
+        display:        [name, type, options, _setting_group, slug]
       actions: ~
       filter:  
         class: false
       form:    ~
       new:     
         title:          New Setting
-        display:        [name, type, options]
+        display:        [name, type, options, _setting_group]

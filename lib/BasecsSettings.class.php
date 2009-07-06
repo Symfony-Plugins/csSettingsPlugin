@@ -5,8 +5,8 @@
  * 
  * @package 
  * @version $id$
- * @copyright 2006-2007 Chris Wage
- * @author Chris Wage <cwage@centresource.com> 
+ * @copyright 2006-2007 Brent Shaffer
+ * @author Brent Shaffer <bshaffer@centresource.com> 
  * @license See LICENSE that came packaged with this software
  */
 class BasecsSettings
@@ -27,44 +27,7 @@ class BasecsSettings
     
     return $user->$authMethod();
   }
-  /**
-   * load
-  * static method to pre-load the specified settings into memory. Use this
-  * early in execution to avoid multiple SQL calls for individual settings.
-  * Takes either a string or an array of strings as an argument.
-   * 
-   * @param mixed $settings 
-   * @static
-   * @access public
-   * @return void
-   */
-  static function load($settings)
-  {
-    if (is_string($settings)) 
-    {
-      $settings = array($settings);
-    } 
-    elseif (!is_array($settings)) 
-    {
-      // Not a string or array, bomb out:
-      return 0;
-    }
-    
-    $query = Doctrine::getTable('csSetting')
-                  ->createQuery('s')
-                  ->whereIn('s.name', $settings);
-  
-    $result = $query->execute();
-    
-    $objArray = array();
-  
-    foreach ($result as $setting)
-    {
-      $objArray[$setting->getName()] = $setting;
-    }
-    
-    sfContext::getInstance()->getRequest()->setAttribute('csSettings', $objArray);
-  }
+
 
   /**
    * getSetting
@@ -77,38 +40,11 @@ class BasecsSettings
    */
   static function getSetting($setting)
   {
-   if (!is_string($setting) || empty($setting)) {
-    return 0;
-  }
-  // If all the settings have been requested, there's no need to check for
-  // individuals. This avoids additional queries later on.
-  if (sfContext::getInstance()->getRequest()->hasAttribute('AllcsSettings')) {
-   $settings = sfContext::getInstance()->getRequest()->getAttribute('AllcsSettings');
-  } else {
-   $settings = sfContext::getInstance()->getRequest()->getAttribute('csSettings');
-  }
-   if (isset($settings[$setting])) {
-    $obj = $settings[$setting];
-    return $obj;
-   } else {
-    // Setting was not pre-loaded via ->load() but we'll be nice and retrieve
-    // the setting anyhow:
-    $query = new Doctrine_Query();
-    $query->addSelect("s.*");
-    $query->addFrom("csSetting s");
-    $query->addWhere("s.name = :name", array(":name" => $setting));
-    if ($obj = $query->limit(1)->execute()->getFirst()) {
-      // Store this setting in memory for later retrieval to avoid a second
-      // query for the same setting:
-      $settings[$obj->getName()] = $obj;
-      sfContext::getInstance()->getRequest()->setAttribute('csSettings',
-      $settings);
-      // return it:
-      return $obj;
-    } else {
-      return 0;
-    }
-   }
+    $query = Doctrine::getTable('csSetting')
+                  ->createQuery('s')
+                  ->addWhere("s.name = ?", $setting);
+                  
+    return $query->fetchOne();
   }
 
   /**
@@ -122,11 +58,20 @@ class BasecsSettings
    */
   static function get($setting)
   {
-   if ($obj = self::getSetting($setting)) {
-    return $obj->getValue();
-   } else {
-    return 0;
-   }
+    // Pull from cached settings array
+    $settingsArray = self::getAll();
+    if (isset($settingsArray[$setting])) 
+    {
+      return $settingsArray[$setting];
+    }
+    
+    // If the key does not exist, it may be pulling by name instead of slug.  
+    // Query the database
+    $query = Doctrine::getTable('csSetting')
+                  ->createQuery('s')
+                  ->addWhere("s.name = ?", $setting);
+
+    return $query->fetchOne();
   }
 
   /**
@@ -138,27 +83,19 @@ class BasecsSettings
    */
   static function getAllSettings()
   {
-   if (sfContext::getInstance()->getRequest()->hasAttribute('AllcsSettings')) {
-    return
-    sfContext::getInstance()->getRequest()->getAttribute('AllcsSettings');
-   } else {
-    $query = new Doctrine_Query();
-    $query->addFrom("csSetting s");
-    $result = $query->execute()->getData();
+    $result = Doctrine::getTable('csSetting')->findAll();
     $objArray = array();
     foreach ($result as $setting)
     {
       $objArray[$setting->getName()] = $setting;
     }
-    sfContext::getInstance()->getRequest()->setAttribute('AllcsSettings',
-    $objArray);
     return $objArray;
-   }
   }
 
   /**
    * getAll 
-  * Returns a hash of settings
+   * Returns an array of settings 
+   * (key: setting slug, value: setting value)
    * 
    * @static
    * @access public
@@ -166,13 +103,24 @@ class BasecsSettings
    */
   static function getAll()
   {
-   $result = array();
-   foreach (self::getAllSettings() as $obj)
-   {
-    $result[$obj->getName()] = $obj->getValue();
-   }
-   return $result;
+    $cachePath = sfConfig::get('sf_cache_dir').'/cs_settings.cache';
+    if (!file_exists($cachePath))
+    {
+      $settingsArray = array();
+      foreach (Doctrine::getTable('csSetting')->findAll() as $setting) 
+      {
+        $settingsArray[$setting['slug']] = $setting->getValue();
+      }
+      
+      // Cache Settings
+      $serialized = serialize($settingsArray);
+      file_put_contents($cachePath, $serialized);
+    } 
+    else
+    {
+      // Pull settings array
+      $settingsArray = unserialize(file_get_contents($settings));
+    }
+    return $settingsArray;
   }
 }
-
-?>

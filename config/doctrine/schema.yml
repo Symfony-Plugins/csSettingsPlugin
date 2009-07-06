@@ -1,17 +1,26 @@
 ---
 csSetting:
-  actAs: [Sluggable]
+  actAs: 
+    Sluggable:
+      fields: [name]
   columns:
     id:
       type: integer(4)
       primary: true
       autoincrement: true
     name:
-      type: string(255)
-      unique: true
+      type:     string(255)
+      unique:   true
+      notnull:  true
     type:
       type: string(255)
+      notnull:  true
+      default:  input
+    setting_group:
+      type: string(255)
+      notnull:  true
+      default:  ''
     options:
-      type: string
+      type: clob
     value:
       type: clob
