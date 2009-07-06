@@ -37,17 +37,17 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
         'Checkbox' => 'HTML Attributes', 
         'Checkbox' => 'Choices (key=value)', 
         'Yes/No Radios' => 'HTML Attributes',
-        'Database Model' => 'Widget Options (*model=MyModel method=__toString add_empty=true)',
-        'Upload' => 'Widget Options',
+        'Database Model' => '<a href="http://www.symfony-project.org/api/1_2/sfWidgetFormDoctrineChoice" target="_blank">Widget Options</a> (*model=MyModel method=__toString add_empty=true)',
+        'Upload' => '<a href="http://www.symfony-project.org/api/1_2/sfWidgetFormInputFileEditable" target="_blank">Widget Options</a>',
         );
         
-    $helpStr = '';
+    $helpStr = '<b>The following options are supported for each setting type</b>:<ul>';
     
     foreach ($help as $key => $value) 
     {
-      $helpStr .= "$key: $value<br />";
+      $helpStr .= "<li>$key: $value</li>";
     }
-    $helpStr .= '* required';
+    $helpStr .= '</ul>* required';
     
     $this->widgetSchema->setLabel('slug', 'Handle');
     $this->widgetSchema->setHelp('slug', 'This is used in your code to pull the value for this setting.  Use csSettings::get($handle);');
@@ -63,7 +63,7 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
     {
       return $this->$method();
     }
-    return new sfWidgetFormInput();
+    return new sfWidgetFormInput(array(), $this->getObject()->getOptionsArray());
   }
 
   public function getSettingValidator()
@@ -92,7 +92,7 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
   // Type Yesno
   public function getYesnoSettingWidget()
   {
-    return new sfWidgetFormSelectRadio(array('choices' => array('yes' => 'Yes', 'no' => 'No')));
+    return new sfWidgetFormSelectRadio(array('choices' => array('yes' => 'Yes', 'no' => 'No')), $this->getObject()->getOptionsArray());
   }
   public function getYesnoSettingValidator()
   {
@@ -104,6 +104,11 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
   {
     return new sfWidgetFormSelect(array('choices' => $this->getObject()->getOptionsArray()));
   }
+  public function getSelectSettingValidator()
+  {
+    return new sfValidatorChoice(array('choices' => $this->getObject()->getOptionsArray()));
+  }
+  
   //Type Model
   public function getModelSettingWidget()
   {
@@ -128,10 +133,17 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
     
     return new sfWidgetFormInputFileEditable($options);
   }
+  
+  // Overriding Bind in this case allows us to have the form field "setting_group_new" for usability
   public function bind(array $taintedValues = null, array $taintedFiles = null)
   {
     $taintedValues['setting_group'] = (isset($taintedValues['setting_group_new']) && $taintedValues['setting_group_new']) ?  $taintedValues['setting_group_new'] : $taintedValues['setting_group'];
     unset($taintedValues['setting_group_new']);
-    return parent::bind($taintedValues, $taintedFiles);
+    $ret = parent::bind($taintedValues, $taintedFiles);
+    if (!$this->isValid()) 
+    {
+      exit(print_r($this->getErrorList()));
+    }
+    return $ret;
   }
 }

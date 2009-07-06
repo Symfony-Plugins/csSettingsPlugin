@@ -18,7 +18,6 @@ csSetting:
       default:  input
     setting_group:
       type: string(255)
-      notnull:  true
       default:  ''
     options:
       type: clob

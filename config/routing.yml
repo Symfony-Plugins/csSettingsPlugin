@@ -3,7 +3,7 @@ cs_setting:
   options:
     model:                csSetting
     module:               csSetting
-    prefix_path:          cs_setting
+    prefix_path:          settings
     column:               id
     with_wildcard_routes: true
 
