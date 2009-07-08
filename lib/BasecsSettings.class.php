@@ -47,7 +47,7 @@ class BasecsSettings
     }
     
     //Look in app.ymls for setting
-    return sfConfig::get('app_'.$setting);
+    return sfConfig::get('app_'.self::settingize($setting));
   }
 
   /**

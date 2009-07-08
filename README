@@ -1,17 +1,51 @@
 # Symfony Doctrine Settings Plugin #
 
-This plugin allows the easy use of a basic dynamic settings table. Much like the
-{{{ sfConfig::get() }}} method, use {{{ csSettings::get() }}} to call dynamic settings.  An admin 
-generator interface (csSettings module) allows easy setting administration.
+Much like the `` sfConfig::get() `` method, use `` csSettings::get() `` to call dynamic, user-defined settings.  
+An admin generator interface allows easy administration.
 
 All settings are cached when first loaded, and the cache is refreshed whenever a
-setting is changed or added.  
+setting is changed or added.
 
-After the settings have been loaded, they are cached for retrieval by
-{{{ csSettings::get() }}} (returns a string value) or {{{ csSettings::getSetting() }}} (returns
-an csSetting object)
+After the settings have been loaded, retrieve them with `` csSettings::get() `` 
+(returns a string value) or `` csSettings::getSetting() `` (returns a csSetting object)
 
-## Backend ##
+## Usage ##
+
+To create a setting, you can add one in using a fixture, or using the DIY admin module interface (see below)
+    
+    [yaml]
+    # in YAML fixture:
+    csSetting:
+      test_setting:
+        name:             My Fake Setting
+        value:            yesno                 # optional: defaults to 'input'
+        setting_default:  yes                   # optional, defaults to empty string
+        options:          class=my-fake-setting # optional, more on this below
+
+You can pull your setting into your project with the class method `` get ``.  This takes
+either the name of your setting or the inflected name of your setting.
+
+    [php]
+    $value = csSettings::get('My Fake Setting');  // The name of your setting
+    $value = csSettings::get('my_fake_setting');  // This will also work
+
+You can also use csSettings to call settings in your app.yml.  By default, if the value passed
+to the `` get `` method is null, `` sfConfig `` is called:
+
+    [php]
+    $value = csSettings::get('this_setting_does_not_exist'); 
+    // If a csSetting does not exist with this name, this returns the same as:
+    $value = sfConfig::get('app_this_setting_does_not_exist');
+    // This also works:
+    $value = csSettings::get('This Setting Does Not Exist');     
+
+Alternatively, the entire `` csSetting `` object can be returned by calling the class method
+`` getSetting ``:
+
+    [php]
+    $setting = csSettings::getSetting('my_fake_setting');
+
+## Admin Module ##
 An admin module also exists for managing the settings in the database. you must enable the module in order to access it
 
     [yaml]
@@ -23,6 +57,7 @@ An admin module also exists for managing the settings in the database. you must 
 This module can be used to edit the variables as the plugin was originally built with the value for the setting being on the 
 list page and editable from there, or it can behave like a normal admin-generated page.
 By default, you must be authenticated to edit the setting configurations themselves.  
+
 If you want to prevent validated users from editing the setting configurations, you can
 override the authMethod setting in your app.yml:
 
@@ -39,14 +74,13 @@ override the authMethod setting in your app.yml:
   * Used as the variable name
   * Must be unique
  * type
-  * Used to decide what type of editor is needed in the csSettings backend
-  * Current Types
    * checkbox
    * input
    * textbox
    * yesno
    * select
-   * wysiwyg
+   * model
+   * upload
  * options
    * checkbox / input / textbox / yesno - sets HTML attributes
    * select
@@ -57,5 +91,10 @@ override the authMethod setting in your app.yml:
      * non-mandatory, but can be used to determine upload path.
  * group
   * organize your settings into groups for improved usability
+ * default
+  * add a default value to your setting, allowing the user to restore the default
+    for a single setting, or restore all setting defaults
  * value
   * The value of the setting
+
+Please contact bshaffer@centresource.com for any questions or suggestions.
