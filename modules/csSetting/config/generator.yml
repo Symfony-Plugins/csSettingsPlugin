@@ -19,14 +19,15 @@ generator:
         object_actions: 
           _edit:    ~
           _delete:  ~
+          restore_defaults: ~
         batch_actions:  []
       edit:
         title:          Edit Setting
-        display:        [name, type, options, _setting_group, slug]
+        display:        [name, type, options, _setting_group, setting_default, slug]
       actions: ~
       filter:  
         class: false
       form:    ~
       new:     
         title:          New Setting
-        display:        [name, type, options, _setting_group]
+        display:        [name, type, options, _setting_group, setting_default]

@@ -1,57 +1,36 @@
 # Symfony Doctrine Settings Plugin #
 
-This plugin allows the easy use of a basic dynamic settings table. It will
-create cs_settings, and allow the use of an admin generator interface (via the
-csSettings module) in order to add/edit/delete settings.
+This plugin allows the easy use of a basic dynamic settings table. Much like the
+{{{ sfConfig::get() }}} method, use {{{ csSettings::get() }}} to call dynamic settings.  An admin 
+generator interface (csSettings module) allows easy setting administration.
 
-Since loading a setting requires a query to the database, performance
-ramifications are best mitigated by using csSettings:load() to pre-load settings
-in the action for use elsewhere, i.e.:
+All settings are cached when first loaded, and the cache is refreshed whenever a
+setting is changed or added.  
 
-## Frontend ##
-    [php]
-    <?php
-    csSettings::load(array('setting1', 'setting2', 'setting3'));
-
-If you have settings that you know you will want loaded by default for every
-action, you can put those in config/defaults.yml.
-
-    [yaml]
-    # /config/filters.yml
-    settings: [ setting_name_1, setting_name_2 ]
-
-
-However you will also need to
-add a filter to the chain so that your settings get loaded, i.e. the following
-lines at the top of appname/config/filters.yml:
-
-    [yaml]
-    # /apps/public/config/filters.yml
-    settings:
-      class: csSettingsFilter
-
-After the settings have been loaded, they are stored in memory for retrieval by
-csSettings::get() (returns a string value) or csSettings::getSetting() (returns
+After the settings have been loaded, they are cached for retrieval by
+{{{ csSettings::get() }}} (returns a string value) or {{{ csSettings::getSetting() }}} (returns
 an csSetting object)
 
 ## Backend ##
-A admin/backend module also exists for managing the settings in the database. you must enable the module in order to access it
+An admin module also exists for managing the settings in the database. you must enable the module in order to access it
 
     [yaml]
-    # /apps/backend/config/settings.yml
+    # /apps/myapp/config/settings.yml
     all:
       .settings:
          enabled_modules:        [default, csSettings]
 
-The backend can be used to edit the variables as the plugin was originally built with the value for the setting being on the list page and editable from there, or it can behave like a normal admin-generated page.
-To make it behave like a normal admin-generated page with the list page only listing current settings with a link to edit the setting and the value being the second page add a setting to your app's app.yml file
+This module can be used to edit the variables as the plugin was originally built with the value for the setting being on the 
+list page and editable from there, or it can behave like a normal admin-generated page.
+By default, you must be authenticated to edit the setting configurations themselves.  
+If you want to prevent validated users from editing the setting configurations, you can
+override the authMethod setting in your app.yml:
 
     [yaml]
-    # /apps/backend/config/app.yml
+    # /config/app.yml
     all:
       csSettingsPlugin:
-        edit_mode: standard_admin
-
+         authMethod:        isSuperAdmin  # or whatever method you want called on myUser.  
 
 ## Fields ##
  * id
@@ -69,26 +48,14 @@ To make it behave like a normal admin-generated page with the list page only lis
    * select
    * wysiwyg
  * options
+   * checkbox / input / textbox / yesno - sets HTML attributes
    * select
-     * An array of options
-   * wysiwyg
-     * Will be appended to the text_area options after `rich=true `
+     * used as the array of options to select from
+   * model
+     * used to determine the model to chose from. Option "model" is required.
+   * upload
+     * non-mandatory, but can be used to determine upload path.
+ * group
+  * organize your settings into groups for improved usability
  * value
   * The value of the setting
-
-## Backend Generator Module ##
-To add to backend, first perform the doctrine generate admin command
-
-	./symfony doctrine:generate-admin backend cs_setting
-
-Then add the following code to the top of the generated actions.class.php in cs_setting/actions:
-
-	require_once(dirname(dirname(__FILE__)).'/../../../../plugins/sfDoctrineSettingsPlugin/modules/cs_setting/lib/Basecs_settingActions.class.php');
-	
-Finally, make sure your new action extends the plugin action
-
-	class cs_settingActions extends Basecs_settingActions
-	{
-	}
-
-Alternatively, just include the module in your code and use as-is!

@@ -40,6 +40,21 @@ class BasecsSettingActions extends AutocsSettingActions
     $this->getUser()->setFlash('notice', 'Your settings have been saved.');
     $this->redirect('@cs_setting');
   }
+  
+  public function executeListRestoreDefault(sfWebRequest $request)
+  {
+    Doctrine::getTable('csSetting')->restoreDefault($request->getParameter('id'));
+    
+    $this->redirect($request->getReferer());
+  }
+  
+  public function executeRestoreAllDefaults(sfWebRequest $request)
+  {
+    Doctrine::getTable('csSetting')->restoreAllDefaults();
+    
+    $this->redirect($request->getReferer());
+  }
+  
   public function processUpload($settings, $files)
   {
     $default_path = csSettings::getDefaultUploadPath();

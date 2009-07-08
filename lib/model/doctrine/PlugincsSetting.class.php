@@ -43,4 +43,15 @@ abstract class PlugincsSetting extends BasecsSetting
   {
     return $this['setting_group'];
   }
+  
+  // remove cache when an item is updated
+  public function postSave($event)
+  {
+    csSettings::clearSettingsCache();
+  }
+  
+  public function postDelete($event)
+  {
+    csSettings::clearSettingsCache();
+  }
 }

@@ -31,4 +31,23 @@ class PlugincsSettingTable extends Doctrine_Table
     $groups = $conn->standaloneQuery('SELECT * from cs_setting');
     return $groups;
   }
+  
+  public function getRestoreDefaultsQuery()
+  {
+    return $this->createQuery('s')
+                ->update()
+                ->set('s.value', 's.setting_default');
+  }
+  
+  public function restoreAllDefaults()
+  {
+    return $this->getRestoreDefaultsQuery()->execute();
+  }
+  
+  public function restoreDefault($id)
+  {
+    $q = $this->getRestoreDefaultsQuery()->addWhere('s.id = ?', $id);
+    
+    return $q->execute();
+  }
 }

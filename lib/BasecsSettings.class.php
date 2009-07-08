@@ -28,25 +28,6 @@ class BasecsSettings
     return $user->$authMethod();
   }
 
-
-  /**
-   * getSetting
-  * pulls the csSetting object for a given setting
-   * 
-   * @param string $setting 
-   * @static
-   * @access public
-   * @return object csSetting
-   */
-  static function getSetting($setting)
-  {
-    $query = Doctrine::getTable('csSetting')
-                  ->createQuery('s')
-                  ->addWhere("s.name = ?", $setting);
-                  
-    return $query->fetchOne();
-  }
-
   /**
    * get 
   * Returns the string value of a particular setting.
@@ -59,21 +40,38 @@ class BasecsSettings
   static function get($setting)
   {
     // Pull from cached settings array
-    $settingsArray = self::getAll();
+    $settingsArray = self::getSettingsArray();
     if (isset($settingsArray[$setting])) 
     {
       return $settingsArray[$setting];
     }
     
-    // If the key does not exist, it may be pulling by name instead of slug.  
-    // Query the database
-    $query = Doctrine::getTable('csSetting')
-                  ->createQuery('s')
-                  ->addWhere("s.name = ?", $setting);
-
-    return $query->fetchOne();
+    //Look in app.ymls for setting
+    return sfConfig::get('app_'.$setting);
   }
 
+  /**
+   * getSetting
+  * pulls the csSetting object for a given setting
+   * 
+   * @param string $setting 
+   * @static
+   * @access public
+   * @return object csSetting
+   */
+  static function getSetting($setting)
+  {
+    $objArray = self::getAllSettings();
+    if (isset($objArray[$setting])) 
+    {
+      $ret = new csSetting();
+      $ret->fromArray($objArray[$setting]);
+      return $ret;
+    }
+                  
+    return null;
+  }
+  
   /**
    * getAllSettings 
    * Returns an array of all setting objects 
@@ -83,11 +81,24 @@ class BasecsSettings
    */
   static function getAllSettings()
   {
-    $result = Doctrine::getTable('csSetting')->findAll();
-    $objArray = array();
-    foreach ($result as $setting)
+    $cachePath = sfConfig::get('sf_cache_dir').'/'.self::getCache('object_array');
+    if (!file_exists($cachePath))
     {
-      $objArray[$setting->getName()] = $setting;
+      $objArray = array();
+      foreach (Doctrine::getTable('csSetting')->findAll() as $setting)
+      {
+        $objArray[$setting['slug']] = $setting->toArray();
+        $objArray[$setting['name']] = $setting->toArray();
+      }
+      
+      // Cache Settings
+      $serialized = serialize($objArray);
+      file_put_contents($cachePath, $serialized);
+    } 
+    else
+    {
+      // Pull settings array
+      $objArray = unserialize(file_get_contents($cachePath));
     }
     return $objArray;
   }
@@ -95,21 +106,22 @@ class BasecsSettings
   /**
    * getAll 
    * Returns an array of settings 
-   * (key: setting slug, value: setting value)
+   * (key: setting slug or name, value: setting value)
    * 
    * @static
    * @access public
    * @return void
    */
-  static function getAll()
+  static function getSettingsArray()
   {
-    $cachePath = sfConfig::get('sf_cache_dir').'/cs_settings.cache';
+    $cachePath = sfConfig::get('sf_cache_dir').'/'.self::getCache('settings_array');
     if (!file_exists($cachePath))
     {
       $settingsArray = array();
       foreach (Doctrine::getTable('csSetting')->findAll() as $setting) 
       {
         $settingsArray[$setting['slug']] = $setting->getValue();
+        $settingsArray[$setting['name']] = $setting->getValue();
       }
       
       // Cache Settings
@@ -119,8 +131,31 @@ class BasecsSettings
     else
     {
       // Pull settings array
-      $settingsArray = unserialize(file_get_contents($settings));
+      $settingsArray = unserialize(file_get_contents($cachePath));
     }
     return $settingsArray;
+  }
+  
+  static public function clearSettingsCache()
+  {
+    foreach (self::getCache() as $cachedir) 
+    {
+      $cachePath = sfConfig::get('sf_cache_dir').'/'.$cachedir;
+      if (file_exists($cachePath)) 
+      {
+        unlink($cachePath);
+      }
+    }
+  }
+  
+  static public function getCache($key = '')
+  {
+    $cache = sfConfig::get('app_csSettingsPlugin_cachepaths');
+    return $key ? $cache[$key] : $cache;
+  }
+  
+  static public function settingize($anystring)
+  {
+    return str_replace('-', '_', Doctrine_Inflector::urlize(trim($anystring)));
   }
 }

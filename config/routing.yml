@@ -8,7 +8,10 @@ cs_setting:
     with_wildcard_routes: true
 
 cs_setting_save_all:
-  url:     /cs_setting_save_all
+  url:     /settings/save_all
   param:   { module: csSetting, action: listSaveSettings }
   requirements: { sf_method: post }
-  
+
+cs_setting_restore_all_defaults:
+  url:    /settings/restore_all
+  param:  { module: csSetting, action: restoreAllDefaults }

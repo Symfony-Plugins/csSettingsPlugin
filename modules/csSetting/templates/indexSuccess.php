@@ -1,6 +1,8 @@
 <?php use_helper('I18N', 'Date') ?>
 <?php include_partial('csSetting/assets') ?>
 
+<?php $sf_response->addStylesheet('/csSettingsPlugin/css/cs_settings.css') ?>
+
 <div id="sf_admin_container">
   <h1><?php echo __('Settings', array(), 'messages') ?></h1>
 
