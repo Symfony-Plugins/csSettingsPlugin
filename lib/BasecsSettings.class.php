@@ -30,7 +30,7 @@ class BasecsSettings
 
   /**
    * get 
-  * Returns the string value of a particular setting.
+   * Returns the string value of a particular setting.
    * 
    * @param string $setting 
    * @static

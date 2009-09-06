@@ -18,8 +18,8 @@ To create a setting, you can add one in using a fixture, or using the DIY admin 
     csSetting:
       test_setting:
         name:             My Fake Setting
-        value:            yesno                 # optional: defaults to 'input'
-        setting_default:  yes                   # optional, defaults to empty string
+        type:             yesno                 # optional: defaults to 'input'
+        setting_default:  'yes'                 # optional, defaults to empty string
         options:          class=my-fake-setting # optional, more on this below
 
 You can pull your setting into your project with the class method `` get ``.  This takes
@@ -82,18 +82,19 @@ override the authMethod setting in your app.yml:
    * model
    * upload
  * options
-   * checkbox / input / textbox / yesno - sets HTML attributes
+   * checkbox / input / textbox / yesno - sets HTML attributes of the widget
    * select
      * used as the array of options to select from
    * model
      * used to determine the model to chose from. Option "model" is required.
    * upload
-     * non-mandatory, but can be used to determine upload path.
+     * upload_path: not required, but can be used to determine upload path.
  * group
   * organize your settings into groups for improved usability
- * default
+ * setting_default
   * add a default value to your setting, allowing the user to restore the default
-    for a single setting, or restore all setting defaults
+    for a single setting, or restore all setting defaults.
+  * if no value is set for your setting initially, this value will be used
  * value
   * The value of the setting
 

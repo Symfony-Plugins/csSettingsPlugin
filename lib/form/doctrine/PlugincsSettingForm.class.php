@@ -140,10 +140,6 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
     $taintedValues['setting_group'] = (isset($taintedValues['setting_group_new']) && $taintedValues['setting_group_new']) ?  $taintedValues['setting_group_new'] : $taintedValues['setting_group'];
     unset($taintedValues['setting_group_new']);
     $ret = parent::bind($taintedValues, $taintedFiles);
-    if (!$this->isValid()) 
-    {
-      exit(print_r($this->getErrorList()));
-    }
     return $ret;
   }
 }

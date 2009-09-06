@@ -7,10 +7,10 @@
  */
 abstract class PlugincsSetting extends BasecsSetting
 {
+  // Get a value from the options array
   public function getOption($name, $required = false)
   {
-    sfProjectConfiguration::getActive()->loadHelpers(array('Tag'));
-    $config = _parse_attributes($this->getOptions());
+    $config = $this->getOptionsArray();
     
     if ($required && !isset($config[$name])) 
     {
@@ -20,12 +20,13 @@ abstract class PlugincsSetting extends BasecsSetting
     return isset($config[$name]) ? $config[$name] : false;
   }
   
+  // convert the options text area to an array
   public function getOptionsArray()
   {
-    sfProjectConfiguration::getActive()->loadHelpers(array('Tag'));
-    return _parse_attributes($this->getOptions());
+    return sfToolkit::stringToArray($this->getOptions());
   }
   
+  // path to uploaded files
   public function getUploadPath()
   {
     if ($this['type'] != 'upload') 
@@ -39,6 +40,8 @@ abstract class PlugincsSetting extends BasecsSetting
     
     return $target_path ? $target_path : $default_path;
   }
+  
+  // shortcut for getting the setting group (field name 'group' is reserved)
   public function getGroup()
   {
     return $this['setting_group'];
@@ -53,5 +56,14 @@ abstract class PlugincsSetting extends BasecsSetting
   public function postDelete($event)
   {
     csSettings::clearSettingsCache();
+  }
+  
+  // Ensures default value is set when object is saved without a value
+  public function preInsert($event)
+  {
+    if ($this['setting_default'] && !$this['value']) 
+    {
+      $this['value'] = $this['setting_default'];
+    }
   }
 }

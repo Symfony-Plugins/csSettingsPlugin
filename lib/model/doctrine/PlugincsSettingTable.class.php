@@ -25,12 +25,6 @@ class PlugincsSettingTable extends Doctrine_Table
     }
     return array_filter($groupArray);
   }
-  public function getExistingGroupsArrayTest()
-  {
-    $conn = Doctrine_Manager::connection();
-    $groups = $conn->standaloneQuery('SELECT * from cs_setting');
-    return $groups;
-  }
   
   public function getRestoreDefaultsQuery()
   {
