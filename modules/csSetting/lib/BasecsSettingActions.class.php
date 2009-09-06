@@ -6,8 +6,8 @@
  * @uses autocsSettingsActions
  * @package 
  * @version $id$
- * @copyright 2006-2007 Chris Wage
- * @author Chris M. Wage <cwage@centresource.com>
+ * @copyright 2006-2007 Brent Shaffer
+ * @author Brent Shaffer <bshaffer@centresource.com>
  * @license See LICENSE that came packaged with this software
  */
 class BasecsSettingActions extends AutocsSettingActions
