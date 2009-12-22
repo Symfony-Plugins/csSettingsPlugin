@@ -23,11 +23,11 @@ generator:
         batch_actions:  []
       edit:
         title:          Edit Setting
-        display:        [name, type, options, _setting_group, setting_default, slug]
+        display:        [name, type, widget_options, _setting_group, setting_default, slug]
       actions: ~
       filter:  
         class: false
       form:    ~
       new:     
         title:          New Setting
-        display:        [name, type, options, _setting_group, setting_default]
+        display:        [name, type, widget_options, _setting_group, setting_default]

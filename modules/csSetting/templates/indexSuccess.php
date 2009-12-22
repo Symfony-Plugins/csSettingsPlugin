@@ -14,7 +14,7 @@
 
 
   <div id="sf_admin_content">
-    <?php use_helper('Form') ?>
+    <?php //use_helper('Form') ?>
     <?php echo form_tag('@cs_setting_save_all', array('multipart' => true)); ?>
     <?php include_partial('csSetting/list', array('pager' => $pager, 'sort' => $sort, 'helper' => $helper, 'form' => $form)) ?>
     <ul class="sf_admin_actions">

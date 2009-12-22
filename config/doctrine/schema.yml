@@ -17,7 +17,7 @@ csSetting:
       type: string(255)
       notnull:  true
       default:  input
-    options:
+    widget_options:
       type: clob
     value:
       type: clob

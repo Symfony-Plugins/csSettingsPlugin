@@ -9,8 +9,9 @@
  */
 abstract class PlugincsSettingForm extends BasecsSettingForm
 {
-  public function configure()
+  public function setup()
   { 
+    parent::setup();
     $this->widgetSchema['type'] = new sfWidgetFormSelectRadio(array(
                                        'choices' => sfConfig::get('app_csSettingsPlugin_types'),
                                        ));
@@ -51,29 +52,49 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
     
     $this->widgetSchema->setLabel('slug', 'Handle');
     $this->widgetSchema->setHelp('slug', 'This is used in your code to pull the value for this setting.  Use csSettings::get($handle);');
-    $this->widgetSchema->setHelp('options', $helpStr);    
+    $this->widgetSchema->setLabel('widget_options', 'Options');
+    $this->widgetSchema->setHelp('widget_options', $helpStr);
     $this->widgetSchema->setHelp('setting_group', 'Organize your settings into groups');
   }
 
   public function getSettingWidget()
   {
     $type = $this->getObject()->getType();
+    $name = $this->getObject()->getName();
+    
+    // See if there is a widget specific to this setting
+    $method = 'get'.sfInflector::camelize($name).'SettingWidget';
+    if (method_exists($this, $method))
+    {
+      return $this->$method();
+    }
+    // Else, see if there is a widget specific to this setting's type
     $method = 'get'.sfInflector::camelize($type).'SettingWidget';
     if (method_exists($this, $method))
     {
       return $this->$method();
     }
+    // Return a generic Widget
     return new sfWidgetFormInput(array(), $this->getObject()->getOptionsArray());
   }
 
   public function getSettingValidator()
   {
     $type = $this->getObject()->getType();
+    $name = $this->getObject()->getName();
+    // See if there is a validator specific to this setting
+    $method = 'get'.sfInflector::camelize($name).'SettingValidator';
+    if (method_exists($this, $method))
+    {
+      return $this->$method();
+    }
+    // Else, see if there is a validator specific to this setting's type
     $method = 'get'.sfInflector::camelize($type).'SettingValidator';
     if (method_exists($this, $method))
     {
       return $this->$method();
     }
+    // Return a generic Validator    
     return new sfValidatorString();
   }
   

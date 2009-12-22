@@ -12,10 +12,10 @@
   <email>bshaffer@centresource.com</email>
   <active>yes</active>
  </lead>
- <date>2009-07-07</date>
+ <date>2009-09-06</date>
  <version>
-   <release>1.0.0</release>
-   <api>1.0.0</api>
+   <release>1.0.1</release>
+   <api>1.0.1</api>
  </version>
  <stability>
   <release>stable</release>

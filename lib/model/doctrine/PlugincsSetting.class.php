@@ -23,7 +23,7 @@ abstract class PlugincsSetting extends BasecsSetting
   // convert the options text area to an array
   public function getOptionsArray()
   {
-    return sfToolkit::stringToArray($this->getOptions());
+    return sfToolkit::stringToArray($this->getWidgetOptions());
   }
   
   // path to uploaded files

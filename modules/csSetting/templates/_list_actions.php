@@ -1,5 +1,5 @@
 <li class='sf_admin_action_save_settings'>
-  <?php echo submit_tag('Save Settings'); ?>
+  <input type="submit" name="submit" value="Save Settings">
 </li>
 <?php if (csSettings::isAuthenticated($sf_user)): ?>
   <?php echo $helper->linkToNew(array(  'params' =>   array(  ),  'class_suffix' => 'new',  'label' => 'New',)) ?>
