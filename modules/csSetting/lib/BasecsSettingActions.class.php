@@ -20,25 +20,39 @@ class BasecsSettingActions extends AutocsSettingActions
   
   public function executeListSaveSettings(sfWebRequest $request)
   {
-    if($settings = $this->getRequestParameter('cs_setting'))
+    self::executeIndex($request);
+    if($settings = $request->getParameter('cs_setting'))
     {
-      foreach($settings AS $slug => $value)
+      $this->form = new SettingsListForm();
+      $this->form->bind($settings, $request->getfiles('cs_setting'));
+      if ($this->form->isValid()) 
       {
-        $setting = Doctrine::getTable('csSetting')->findOneBySlug($slug);
-        if ($setting) 
+        foreach($this->form->getValues() as $slug => $value)
         {
-          $setting->setValue($value);
-          $setting->save();
+          $setting = Doctrine::getTable('csSetting')->findOneBySlug($slug);
+          if ($setting) 
+          {
+            $setting->setValue($value);
+            $setting->save();
+          }
         }
+        
+        if($files = $request->getFiles('cs_setting'))
+        {
+          $this->processUpload($settings, $files);
+        }
+        
+        // Update form with new values
+        $this->form = new SettingsListForm();
+
+        $this->getUser()->setFlash('notice', 'Your settings have been saved.');
+      }
+      else
+      {
+        $this->getUser()->setFlash('error', 'Your form contains some errors');
       }
     }
-    
-    if($files = $request->getFiles('cs_setting'))
-    {
-      $this->processUpload($settings, $files);
-    }
-    $this->getUser()->setFlash('notice', 'Your settings have been saved.');
-    $this->redirect('@cs_setting');
+    $this->setTemplate('index');
   }
   
   public function executeListRestoreDefault(sfWebRequest $request)

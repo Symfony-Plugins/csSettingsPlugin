@@ -7,6 +7,11 @@
  */
 class PlugincsSettingTable extends Doctrine_Table
 {
+  public function findAllForList()
+  {
+    return $this->findAll();
+  }
+  
   public function findSettingsByGroup($query)
   {
     return $query->addOrderBy($query->getRootAlias().'.setting_group ASC');

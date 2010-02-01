@@ -9,54 +9,6 @@
  */
 abstract class PlugincsSettingForm extends BasecsSettingForm
 {
-  public function setup()
-  { 
-    parent::setup();
-    $this->widgetSchema['type'] = new sfWidgetFormSelectRadio(array(
-                                       'choices' => sfConfig::get('app_csSettingsPlugin_types'),
-                                       ));
-    
-    $choices = Doctrine::getTable('csSetting')->getExistingGroupsArray();
-    
-    if ($choices) 
-    {
-      $choices = array_merge(array('' => ''), $choices);
-      $this->widgetSchema['setting_group'] = new sfWidgetFormSelect(array(
-                                         'choices' => $choices,
-                                         ));
-    }
-    
-    $this->widgetSchema->setLabel('setting_group', 'Group');
-            
-    $this->validatorSchema->setPostValidator(
-      new sfValidatorDoctrineUnique(array('model' => 'csSetting', 'column' => array('name')), array('invalid' => 'Cannot use this name, a setting with this name already exists!'))
-    );
-    
-    $help = array(
-        'Text Field' => 'HTML Attributes', 
-        'Text Area' => 'HTML Attributes', 
-        'Checkbox' => 'HTML Attributes', 
-        'Checkbox' => 'Choices (key=value)', 
-        'Yes/No Radios' => 'HTML Attributes',
-        'Database Model' => '<a href="http://www.symfony-project.org/api/1_2/sfWidgetFormDoctrineChoice" target="_blank">Widget Options</a> (*model=MyModel method=__toString add_empty=true)',
-        'Upload' => '<a href="http://www.symfony-project.org/api/1_2/sfWidgetFormInputFileEditable" target="_blank">Widget Options</a>',
-        );
-        
-    $helpStr = '<b>The following options are supported for each setting type</b>:<ul>';
-    
-    foreach ($help as $key => $value) 
-    {
-      $helpStr .= "<li>$key: $value</li>";
-    }
-    $helpStr .= '</ul>* required';
-    
-    $this->widgetSchema->setLabel('slug', 'Handle');
-    $this->widgetSchema->setHelp('slug', 'This is used in your code to pull the value for this setting.  Use csSettings::get($handle);');
-    $this->widgetSchema->setLabel('widget_options', 'Options');
-    $this->widgetSchema->setHelp('widget_options', $helpStr);
-    $this->widgetSchema->setHelp('setting_group', 'Organize your settings into groups');
-  }
-
   public function getSettingWidget()
   {
     $type = $this->getObject()->getType();
@@ -95,7 +47,7 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
       return $this->$method();
     }
     // Return a generic Validator    
-    return new sfValidatorString();
+    return new sfValidatorString(array('required' => false));
   }
   
   //Type Textarea
@@ -109,6 +61,16 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
   {
     return new sfWidgetFormInputCheckbox(array(), $this->getObject()->getOptionsArray());
   }
+
+  // Type Date
+  public function getDateTimeSettingWidget()
+  {
+    return new sfWidgetFormDateTime($this->getObject()->getOptionsArray());
+  }
+  public function getDateTimeSettingValidator()
+  {
+    return new sfValidatorDateTime(array('required' => false));
+  }
   
   // Type Yesno
   public function getYesnoSettingWidget()
@@ -117,17 +79,17 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
   }
   public function getYesnoSettingValidator()
   {
-    return new sfValidatorChoice(array('choices' => array('yes', 'no')));
+    return new sfValidatorChoice(array('choices' => array('yes', 'no'), 'required' => false));
   }
   
   //Type Select List
   public function getSelectSettingWidget()
   {
-    return new sfWidgetFormSelect(array('choices' => $this->getObject()->getOptionsArray()));
+    return new sfWidgetFormSelect(array('choices' => $this->getObject()->getOptionsArray(), 'required' => false));
   }
   public function getSelectSettingValidator()
   {
-    return new sfValidatorChoice(array('choices' => $this->getObject()->getOptionsArray()));
+    return new sfValidatorChoice(array('choices' => $this->getObject()->getOptionsArray(), 'required' => false));
   }
   
   //Type Model
