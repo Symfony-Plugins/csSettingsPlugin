@@ -24,8 +24,19 @@ class BasecsSettings
     }
     
     $authMethod = sfConfig::get('app_csSettingsPlugin_authMethod');
+    $authCredential = sfConfig::get('app_csSettingsPlugin_authCredential');
     
-    return $user->$authMethod();
+    $hasAccess = false;
+    if ($authMethod) 
+    {
+      $hasAccess = $user->$authMethod();
+    }
+    if (!$hasAccess && $authCredential) 
+    {
+      $hasAccess = $user->hasCredential($authCredential);
+    }
+    
+    return $hasAccess;
   }
 
   /**
