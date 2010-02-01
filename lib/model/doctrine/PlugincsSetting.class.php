@@ -66,4 +66,16 @@ abstract class PlugincsSetting extends BasecsSetting
       $this['value'] = $this['setting_default'];
     }
   }
+  
+  public function getValue()
+  {
+    switch ($this['type']) 
+    {
+      case 'checkbox':
+      case 'yesno':
+        return (bool) $this->_get('value');
+    }
+    
+    return $this->_get('value');
+  }
 }
