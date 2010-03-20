@@ -16,6 +16,9 @@
   <div id="sf_admin_content">
     <?php //use_helper('Form') ?>
     <?php echo form_tag('@cs_setting_save_all', array('multipart' => true)); ?>
+    <?php if ($form->isCSRFProtected()) : ?>
+      <?php echo $form['_csrf_token']->render(); ?>
+    <?php endif; ?>
     <?php include_partial('csSetting/list', array('pager' => $pager, 'sort' => $sort, 'helper' => $helper, 'form' => $form)) ?>
     <ul class="sf_admin_actions">
       <?php include_partial('csSetting/list_batch_actions', array('helper' => $helper)) ?>
