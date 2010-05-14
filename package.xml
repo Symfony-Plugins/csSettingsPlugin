@@ -20,8 +20,8 @@
 </developer>
  <date>2010-04-19</date>
  <version>
-   <release>1.0.2</release>
-   <api>1.0.2</api>
+   <release>1.0.3</release>
+   <api>1.0.3</api>
  </version>
  <stability>
   <release>stable</release>
@@ -95,6 +95,21 @@
      <license uri="http://www.symfony-project.org/license">MIT license</license>
      <notes>
      * Fixed PHP 5.3 and symfony 1.4 problems.
+     </notes>
+  </release>
+  <release>
+     <version>
+      <release>1.0.3</release>
+      <api>1.0.3</api>
+     </version>
+     <stability>
+      <release>stable</release>
+      <api>stable</api>
+     </stability>
+     <date>2010-05-14</date>
+     <license uri="http://www.symfony-project.org/license">MIT license</license>
+     <notes>
+     * Adds ability to use your own cache handler
      </notes>
   </release>
  </changelog>

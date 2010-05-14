@@ -98,4 +98,18 @@ override the authMethod setting in your app.yml:
  * value
   * The value of the setting
 
+## Cache ##
+
+Customize the cache handler for your settings using your app.yml.  By default, __sfNoCache__ is used.
+
+  [yaml]
+  # /config/app.yml
+  all:
+    csSettingsPlugin:
+      cache:
+        class:        sfNoCache
+        options:      []
+
+
+
 Please contact bshaffer@centresource.com for any questions or suggestions.
