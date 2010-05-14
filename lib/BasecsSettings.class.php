@@ -11,6 +11,8 @@
  */
 class BasecsSettings
 {
+  static  $cache = false;
+    
   static function getDefaultUploadPath()
   {
     return 'uploads/setting';
@@ -48,22 +50,49 @@ class BasecsSettings
    * @access public
    * @return string
    */
-  static function get($setting)
+  static function get($setting, $default = null)
   {
     // Pull from cached settings array
-    $settingsArray = self::getSettingsArray();
-    if (isset($settingsArray[$setting]))
+    $cache = self::buildCache('settings_array');
+    
+    if($cache->has('settings_array_'.$setting))
     {
-      return $settingsArray[$setting];
+      return unserialize($cache->get('settings_array_'.$setting));
     }
 
     //Look in app.ymls for setting
-    return sfConfig::get('app_'.self::settingize($setting));
+    return sfConfig::get('app_'.self::settingize($setting), $default);
+  }
+  
+  static function buildCache($type)
+  {
+    $cache_handler = self::getCache();
+
+    if(!$cache_handler->get($type.'_cs_cache_is_built', false))
+    {
+      foreach (Doctrine::getTable('csSetting')->findAll() as $setting)
+      {
+        if($type == 'settings_array')
+        {
+          $cache_handler->set($type.'_'.$setting['slug'], serialize($setting->getValue()));
+          $cache_handler->set($type.'_'.$setting['name'], serialize($setting->getValue()));
+        }
+        elseif( $type == 'settings_object')
+        {
+          $cache_handler->set($type.'_'.$setting['slug'], serialize($setting->toArray()));
+          $cache_handler->set($type.'_'.$setting['name'], serialize($setting->toArray()));
+        }
+      }
+      
+      $cache_handler->set($type.'_cs_cache_is_built', true);
+    }
+    
+    return $cache_handler;
   }
 
   /**
    * getSetting
-  * pulls the csSetting object for a given setting
+   * pulls the csSetting object for a given setting
    *
    * @param string $setting
    * @static
@@ -72,99 +101,56 @@ class BasecsSettings
    */
   static function getSetting($setting)
   {
-    $objArray = self::getAllSettings();
-    if (isset($objArray[$setting]))
+
+    if(strlen(trim($setting)) == 0)
+    {
+      throw new sfException('[f6Settings::getSetting] invalid name');
+    }
+    
+    $cache = self::buildCache('settings_object');
+    
+    if ($cache->has('settings_object_'.$setting))
     {
       $ret = new csSetting();
-      $ret->fromArray($objArray[$setting]);
+      $ret->fromArray(unserialize($cache->get('settings_object_'.$setting, serialize(array()))));
+      
+      $value = unserialize($cache->get('settings_object_'.$setting));
+      if(!is_array($value))
+      {
+        return null;
+      }
+      
+      $ret->toArray($value);
+      $ret->assignIdentifier($value['id']);
+      
       return $ret;
     }
 
     return null;
   }
 
-  /**
-   * getAllSettings
-   * Returns an array of all setting objects
-   * @static
-   * @access public
-   * @return array
-   */
-  static function getAllSettings()
-  {
-    $cachePath = sfConfig::get('sf_cache_dir').'/'.self::getCache('object_array');
-    if (!file_exists($cachePath))
-    {
-      $objArray = array();
-      foreach (Doctrine::getTable('csSetting')->findAll() as $setting)
-      {
-        $objArray[$setting['slug']] = $setting->toArray();
-        $objArray[$setting['name']] = $setting->toArray();
-      }
-
-      // Cache Settings
-      $serialized = serialize($objArray);
-      file_put_contents($cachePath, $serialized);
-    }
-    else
-    {
-      // Pull settings array
-      $objArray = unserialize(file_get_contents($cachePath));
-    }
-    return $objArray;
-  }
-
-  /**
-   * getAll
-   * Returns an array of settings
-   * (key: setting slug or name, value: setting value)
-   *
-   * @static
-   * @access public
-   * @return void
-   */
-  static function getSettingsArray()
-  {
-    $cachePath = sfConfig::get('sf_cache_dir').'/'.self::getCache('settings_array');
-    if (!file_exists($cachePath))
-    {
-      $settingsArray = array();
-      foreach (Doctrine::getTable('csSetting')->findAll() as $setting)
-      {
-        $settingsArray[$setting['slug']] = $setting->getValue();
-        $settingsArray[$setting['name']] = $setting->getValue();
-      }
-
-      // Cache Settings
-      $serialized = serialize($settingsArray);
-      file_put_contents($cachePath, $serialized);
-    }
-    else
-    {
-      // Pull settings array
-      $settingsArray = unserialize(file_get_contents($cachePath));
-    }
-    return $settingsArray;
-  }
-
   static public function clearSettingsCache()
   {
-    if(is_array(self::getCache())){
-      foreach (self::getCache() as $cachedir)
-      {
-        $cachePath = sfConfig::get('sf_cache_dir').'/'.$cachedir;
-        if (file_exists($cachePath))
-        {
-          unlink($cachePath);
-        }
-      }
-    }
+    
+    self::getCache()->clean(); 
   }
 
-  static public function getCache($key = '')
+  static public function getCache()
   {
-    $cache = sfConfig::get('app_csSettingsPlugin_cachepaths');
-    return $key ? $cache[$key] : $cache;
+    if(!self::$cache)
+    {
+      $cache_settings = sfConfig::get('app_csSettingsPlugin_cache', array(
+        'class'   => 'sfNoCache',
+        'options' => array()
+      ));
+      
+      $class    = $cache_settings['class'];
+      $options  = $cache_settings['options'];
+            
+      self::$cache = new $class($options);
+    }
+    
+    return self::$cache;
   }
 
   static public function settingize($anystring)
