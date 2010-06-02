@@ -49,6 +49,14 @@ abstract class PlugincsSettingForm extends BasecsSettingForm
     // Return a generic Validator    
     return new sfValidatorString(array('required' => false));
   }
+
+  public function getRichTextSettingWidget()
+  {
+    if(class_exists('sfWidgetFormCKEditor'))
+     return new sfWidgetFormCKEditor(array(), $this->getObject()->getOptionsArray());
+    else
+      return new sfWidgetFormTextarea(array(), $this->getObject()->getOptionsArray());
+  }
   
   //Type Textarea
   public function getTextareaSettingWidget()

@@ -38,6 +38,7 @@ class csSettingAdminForm extends csSettingForm
         'Yes/No Radios'   => 'HTML Attributes',
         'Database Model'  => '<a href="http://www.symfony-project.org/api/1_2/sfWidgetFormDoctrineChoice" target="_blank">Widget Options</a> (*model=MyModel method=__toString add_empty=true)',
         'Upload'          => '<a href="http://www.symfony-project.org/api/1_2/sfWidgetFormInputFileEditable" target="_blank">Widget Options</a>',
+        'Rich Text'      => 'HTML Attributes',
         );
         
     $helpStr = '<b>The following options are supported for each setting type</b>:<ul>';

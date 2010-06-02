@@ -81,6 +81,7 @@ override the authMethod setting in your app.yml:
    * select
    * model
    * upload
+   * richtext (needs sfCKEditorPlugin to work. If this plugin is not installed, textarea will be displayed)
  * widget_options
    * checkbox / input / textbox / yesno - sets HTML attributes of the widget
    * select
@@ -107,8 +108,12 @@ Customize the cache handler for your settings using your app.yml.  By default, _
   all:
     csSettingsPlugin:
       cache:
-        class:        sfNoCache
-        options:      []
+        class: sfFileCache
+        options:
+          automatic_cleaning_factor: 0
+          cache_dir:                 %SF_TEMPLATE_CACHE_DIR%
+          lifetime:                  86400
+          prefix:                    %SF_APP_DIR%/template
 
 
 

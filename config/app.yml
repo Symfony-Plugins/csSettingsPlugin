@@ -9,6 +9,7 @@ all:
       datetime:     Date/Time
       model:        Database Model
       upload:       Upload
+      richtext:     Rich Text
     
     authMethod:     isSuperAdmin      #used to determine if user is able to edit settings
     
